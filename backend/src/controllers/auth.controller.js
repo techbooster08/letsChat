@@ -68,10 +68,40 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
-  res.send("Login route");
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.json(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.json(400).json({ message: "Invalid credentials" });
+
+    const checkPass = await bcrypt.compare(password, user.password);
+    if (!checkPass) {
+      return res.json(400).json({ message: "Invalid credentials" });
+    }
+
+    generateToken(user._id, res);
+
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.log("error in login controller : ", error);
+    res.status(500).json({ message: "Internal Server error" });
+  }
 };
 
-export const logout = (req, res) => {
-  res.send("Logout route");
+export const logout = (_, res) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: "Logged out successfully" });
 };
