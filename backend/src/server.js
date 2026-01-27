@@ -4,6 +4,7 @@ import apiV1Routes from "./routes/apiV1.route.js";
 import path from "path";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = ENV.PORT;
@@ -11,6 +12,7 @@ const __dirname = path.resolve();
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1", apiV1Routes);
 
