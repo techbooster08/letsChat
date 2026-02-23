@@ -64,4 +64,14 @@ export const useAuthStore = create((set) => ({
       toast.error("Logout failed. Please try again.");
     }
   },
+
+  uploadProfilePic: async (data) => {
+    try {
+      const res = await axiosInstance.put("/profile", data);
+      set({ authUser: res.data });
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
+  },
 }));

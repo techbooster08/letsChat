@@ -15,6 +15,6 @@ router.use("/auth", authRoutes);
 
 router.use(authMiddleware);
 router.use("/profile", profileRoutes);
-router.use("/message", messageRoutes);
+router.use("/messages", messageRoutes);
 
 export default router;

@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import mongoose from "mongoose";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
 
@@ -21,14 +22,19 @@ export const getMessagesByUserId = async (req, res) => {
     const myId = req.user._id;
     const { id: userToChatWithId } = req.params;
 
+    // validate param is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userToChatWithId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
     const messages = await Message.find({
       $or: [
         { senderId: myId, receiverId: userToChatWithId },
-        { sederId: userToChatWithId, receiverId: myId },
+        { senderId: userToChatWithId, receiverId: myId },
       ],
     });
     res.status(200).json(messages);
-  } catch {
+  } catch (error) {
     console.log("Error in Getting Messages : ", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
