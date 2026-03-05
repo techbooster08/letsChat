@@ -1,16 +1,16 @@
-import moongoose from "mongoose";
+import mongoose from "mongoose";
 
-const messageSchema = new moongoose.Schema(
+const messageSchema = new mongoose.Schema(
   {
     senderId: {
-      type: moongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     receiverId: {
-      type: moongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      requires: true,
+      required: true,
     },
     text: {
       type: String,
@@ -21,9 +21,9 @@ const messageSchema = new moongoose.Schema(
       type: String,
     },
   },
-  { timeStamps: true },
+  { timestamps: true },
 );
 
-const Message = moongoose.model("Message", messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 
 export default Message;
