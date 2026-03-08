@@ -46,6 +46,11 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    // validate param is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+      return res.status(400).json({ message: "Invalid receiver id" });
+    }
+
     if (!text && !image) {
       return res.status(400).json({ message: "text or image is required" });
     }

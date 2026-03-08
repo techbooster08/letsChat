@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
+import { useAuthStore } from "./useAuthStore.jsx";
 
 export const useChatStore = create((set, get) => ({
   allContacts: [],
@@ -53,6 +54,39 @@ export const useChatStore = create((set, get) => ({
       toast.error(error?.response?.data?.message || "Failed to load messages");
     } finally {
       set({ isMessagesLoading: false });
+    }
+  },
+
+  sendMessage: async (messageData) => {
+    const { selectedUser, messages } = get();
+    const { authUser } = useAuthStore.getState();
+
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage = {
+      _id: tempId,
+      senderId: authUser._id,
+      text: messageData.text,
+      image: messageData.image,
+      createdAt: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      isOptimistic: true,
+    };
+
+    //immediately add the message to the UI
+    set({ messages: [...messages, optimisticMessage] });
+
+    try {
+      const res = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        messageData,
+      );
+      // Update the messages list with the new message
+      set({ messages: messages.concat(res.data) });
+    } catch (error) {
+      set({ messages: messages });
+      toast.error(error?.response?.data?.message || "Failed to send message");
     }
   },
 }));
